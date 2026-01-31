@@ -1,0 +1,32 @@
+services:
+  vroom-next:
+    build:
+      context: ./vroom-next
+    working_dir: /app
+    container_name: vroom-next
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    environment:
+      - HOSTNAME=${HOSTNAME}
+      - PORT=${PORT}
+      - NODE_ENV=${NODE_ENV}
+    ports:
+      - ${PORT:-3000}:${PORT:-3000}
+    command: bun ./server.js
+
+  postgres:
+    image: postgres:18.1-alpine3.23
+    container_name: ${POSTGRES_HOST:-postgres}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vroom_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-supersecretpassword}
+      POSTGRES_DB: ${POSTGRES_DB:-vroom}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
